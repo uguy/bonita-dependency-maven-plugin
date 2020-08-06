@@ -18,7 +18,6 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-
         <aether.version>1.13.1</aether.version>
     </properties>
 
@@ -27,7 +26,6 @@
     </prerequisites>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
@@ -90,7 +88,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>default-descriptor</id>

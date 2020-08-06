@@ -1,15 +1,21 @@
 package org.bonitasoft.maven;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.io.FilenameUtils;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +28,11 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -36,19 +46,11 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
-
 @Mojo(name = "unpack",
         defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         requiresProject = true,
-        threadSafe = true
-)
+        threadSafe = true)
 public class BonitaDependencyMojo extends AbstractMojo {
 
     /**
@@ -78,31 +80,75 @@ public class BonitaDependencyMojo extends AbstractMojo {
     @Parameter(property = "skip", defaultValue = "false")
     private boolean skip;
 
-
     @Parameter
     private Set<String> includes;
 
+    @Parameter(defaultValue = "${project.basedir}")
+    private File projectDirectory;
+
+    @Parameter(defaultValue = "${project.build.directory}")
+    private File buildDirectory;
+
+    private static final String CONNECTOR_DEF_FOLDER = "connectors-def";
+    private static final String CONNECTOR_IMPL_FOLDER = "connectors-impl";
+    private static final String LIB_FOLDER = "lib";
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-
         if (isSkip()) {
             getLog().info("Skipping plugin execution");
             return;
         }
-
         ArtifactSelector artifactSelector = new ArtifactSelector(project.getDependencies(), includes);
 
         List<Dependency> dependencies = artifactSelector.getDependencies();
         for (Dependency dependency : dependencies) {
             Path path = unpackDependency(dependency);
-            
+            try {
+                Path projectPath = projectDirectory.toPath();
+                Files.walk(path).forEach(child -> {
+                    if (!child.toFile().isDirectory()) {
+                        switch (FilenameUtils.getExtension(child.getFileName().toString())) {
+                            case "def":
+                            case "properties":
+                            case "png": // TODO other image format?
+                                moveToFolder(child, projectPath.resolve(CONNECTOR_DEF_FOLDER));
+                                break;
+                            case "impl":
+                                moveToFolder(child, projectPath.resolve(CONNECTOR_IMPL_FOLDER));
+                                break;
+                            case "jar":
+                                moveToFolder(child, projectPath.resolve(LIB_FOLDER));
+                                break;
+                            default:
+                                getLog().warn(String.format("Unreconize extension for '%s', ignored.",
+                                        child.getFileName().toString()));
+                                break;
+                        }
+                    }
+                });
+            } catch (IOException | RuntimeException e) {
+                throw new MojoFailureException("An error occurred while moving files", e);
+            }
+        }
+    }
+
+    private void moveToFolder(Path sourceFile, Path destinationFolder) {
+        try {
+            Files.copy(sourceFile, destinationFolder.resolve(sourceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    String.format("An error occured while copying file '%s' to '%s'", sourceFile, destinationFolder), e);
         }
     }
 
     protected Path unpackDependency(Dependency dependency) throws MojoExecutionException {
         try {
             File artifactFile = this.getArtifactFile(dependency);
-            Path targetDir = Files.createTempDirectory(artifactFile.getName());
+            if (!buildDirectory.exists()) {
+                buildDirectory.mkdirs();
+            }
+            Path targetDir = Files.createDirectory(buildDirectory.toPath().resolve(dependency.getArtifactId()));
             ZipUtil.unzip(artifactFile, targetDir);
             return targetDir;
         } catch (IOException e) {
@@ -114,7 +160,8 @@ public class BonitaDependencyMojo extends AbstractMojo {
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new org.eclipse.aether.graph.Dependency(toArtifact(dependency), dependency.getScope()));
         remoteRepositories.forEach(collectRequest::addRepository);
-        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, DependencyFilterUtils.classpathFilter(dependency.getScope()));
+        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest,
+                DependencyFilterUtils.classpathFilter(dependency.getScope()));
 
         DependencyResult dependencyResult;
         try {
@@ -134,10 +181,10 @@ public class BonitaDependencyMojo extends AbstractMojo {
         String groupId = dependency.getGroupId();
         String artifactId = dependency.getArtifactId();
         String version = dependency.getVersion();
-        String scope = dependency.getScope();
         String type = dependency.getType();
         String classifier = dependency.getClassifier();
-        return new DefaultArtifact(groupId, artifactId, classifier, type, version);
+        String coord = String.format("%s:%s:%s:%s", groupId, artifactId, type, version); // TODO check it works
+        return new DefaultArtifact(coord);
     }
 
     /**
