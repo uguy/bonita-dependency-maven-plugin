@@ -50,4 +50,6 @@ class DependencySelectorTest {
         // Then
         assertThat(dependencies).containsExactly(myConnectorDep);
     }
+
+
 }

@@ -1,5 +1,6 @@
 package org.bonitasoft.maven.connector;
 
+import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,16 +26,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
 
 @Mojo(name = "connector-unpack",
-        defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+        defaultPhase = LifecyclePhase.GENERATE_SOURCES,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true)
 public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo {
 
-    @Parameter
-    private Connector connector;
+    @Getter
+    @Parameter(name = "connector", property = "connector")
+    private Connector connector = new Connector();
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -42,7 +45,7 @@ public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo 
         List<Dependency> dependencies = dependencySelector.select();
         for (Dependency dependency : dependencies) {
             File artifactFile = resolveDependencyFile(dependency);
-            Path path = unpackDependency(artifactFile);
+            Path path = unpackDependency(artifactFile, buildDirectory.toPath());
             try {
                 Path projectPath = projectDirectory.toPath();
                 Files.walk(path).forEach(child -> {
@@ -71,22 +74,32 @@ public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo 
         }
     }
 
-    private void moveToFolder(Path sourceFile, Path destinationFolder) {
+    protected void moveToFolder(Path sourceFile, Path destinationFolder) {
         try {
-            Files.copy(sourceFile, destinationFolder.resolve(sourceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            // Ensure destination folder exists
+            File destFolder = destinationFolder.toFile();
+            if (!destFolder.exists()) {
+                destFolder.mkdirs();
+            }
+
+            // Copy file to destination
+            Path destFile = destinationFolder.resolve(sourceFile.getFileName());
+            getLog().info(String.format("copy file %s to %s", sourceFile, destFile));
+            Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
+
         } catch (IOException e) {
             throw new RuntimeException(
                     String.format("An error occured while copying file '%s' to '%s'", sourceFile, destinationFolder), e);
         }
     }
 
-    protected Path unpackDependency(File artifactFile) throws MojoExecutionException {
+    protected Path unpackDependency(File artifactFile, Path workingDir) throws MojoExecutionException {
         try {
-            if (!buildDirectory.exists()) {
-                buildDirectory.mkdirs();
+            if (!workingDir.toFile().exists()) {
+                workingDir.toFile().mkdirs();
             }
             String targetFolderName = artifactFile.getName().replace(".zip", "");
-            Path targetFolder = Files.createDirectory(buildDirectory.toPath().resolve(targetFolderName));
+            Path targetFolder = Files.createDirectory(workingDir.resolve(targetFolderName));
             ZipUtil.unzip(artifactFile, targetFolder);
             return targetFolder;
         } catch (IOException e) {
@@ -120,11 +133,11 @@ public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo 
         return artifactResult.getArtifact();
     }
 
-    private org.eclipse.aether.artifact.DefaultArtifact toArtifact(Dependency dependency) {
-        return new DefaultArtifact(dependency.getManagementKey());
-    }
-
-    public void setConnector(Connector connector) {
-        this.connector = connector;
+    protected org.eclipse.aether.artifact.DefaultArtifact toArtifact(Dependency dependency) {
+        //"<groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>"
+        String coords = String.format("%s:%s:%s:%s:%s", dependency.getGroupId(), dependency.getArtifactId(), dependency.getType(), dependency.getClassifier(), dependency.getVersion());
+//        DefaultArtifact defaultArtifact = new DefaultArtifact(coords);
+        DefaultArtifact defaultArtifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion(), new HashMap<String, String>(), (File) null);
+        return defaultArtifact;
     }
 }

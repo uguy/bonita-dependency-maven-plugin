@@ -63,12 +63,7 @@
         </dependency>
         <dependency>
             <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-util</artifactId>
+            <artifactId>aether-impl</artifactId>
             <version>${aether.version}</version>
         </dependency>
 
