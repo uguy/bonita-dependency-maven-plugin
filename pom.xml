@@ -174,7 +174,8 @@
                                     <goal>install-file</goal>
                                 </goals>
                                 <configuration>
-                                    <file>${project.basedir}/src/test/resources/connector-starwars-1.0.0-SNAPSHOT.zip</file>
+                                    <file>${project.basedir}/src/test/resources/connector-starwars-1.0.0-SNAPSHOT.zip
+                                    </file>
                                     <groupId>com.company.connector</groupId>
                                     <artifactId>connector-starwars</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
@@ -188,7 +189,8 @@
                                     <goal>install-file</goal>
                                 </goals>
                                 <configuration>
-                                    <file>${project.basedir}/src/test/resources/sample-actorfilter-1.0.0-SNAPSHOT.zip</file>
+                                    <file>${project.basedir}/src/test/resources/sample-actorfilter-1.0.0-SNAPSHOT.zip
+                                    </file>
                                     <groupId>com.company.actorfilter</groupId>
                                     <artifactId>sample-actorfilter</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
@@ -214,7 +216,7 @@
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <goals>
                                 <goal>clean</goal>
-                                <goal>validate</goal>
+                                <goal>compile</goal>
                             </goals>
                         </configuration>
                         <executions>

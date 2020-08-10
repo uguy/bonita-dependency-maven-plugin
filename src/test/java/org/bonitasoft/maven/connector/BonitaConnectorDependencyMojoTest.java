@@ -2,7 +2,6 @@ package org.bonitasoft.maven.connector;
 
 import org.bonitasoft.maven.AbstractBonitaDependencyMojo;
 import org.bonitasoft.maven.AbstractBonitaDependencyMojoTest;
-import org.bonitasoft.maven.actorfilter.BonitaActorFilterDependencyMojo;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;

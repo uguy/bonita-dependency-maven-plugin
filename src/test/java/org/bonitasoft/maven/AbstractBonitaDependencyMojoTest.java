@@ -2,17 +2,11 @@ package org.bonitasoft.maven;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.bonitasoft.maven.connector.BonitaConnectorDependencyMojo;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

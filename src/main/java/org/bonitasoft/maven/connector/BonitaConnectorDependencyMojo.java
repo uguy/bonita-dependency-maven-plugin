@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Mojo(name = "connector-unpack",
-        defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+        defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true)
 public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo {

@@ -23,7 +23,6 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -91,7 +90,7 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
             // Copy file to destination
             Path destFile = destinationFolder.resolve(sourceFile.getFileName());
-            getLog().info(String.format("copy file %s to %s", sourceFile, destFile));
+            getLog().debug(String.format("copy file %s to %s", sourceFile, destFile));
             Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException e) {
