@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.bonitasoft.maven.its</groupId>
+    <artifactId>test</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.company.actorfilter</groupId>
+            <artifactId>sample-actorfilter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.bonitasoft.maven</groupId>
+                <artifactId>bonita-dependency-plugin</artifactId>
+                <version>@project.version@</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>actorfilter-unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <actorFilter>
+                        <includes>
+                            <include>com.company.actorfilter:sample-actorfilter</include>
+                        </includes>
+                    </actorFilter>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

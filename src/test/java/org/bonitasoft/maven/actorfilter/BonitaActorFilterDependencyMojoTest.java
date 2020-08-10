@@ -1,8 +1,7 @@
-package org.bonitasoft.maven.connector;
+package org.bonitasoft.maven.actorfilter;
 
 import org.bonitasoft.maven.AbstractBonitaDependencyMojo;
 import org.bonitasoft.maven.AbstractBonitaDependencyMojoTest;
-import org.bonitasoft.maven.actorfilter.BonitaActorFilterDependencyMojo;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -11,17 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-class BonitaConnectorDependencyMojoTest extends AbstractBonitaDependencyMojoTest {
-
+class BonitaActorFilterDependencyMojoTest extends AbstractBonitaDependencyMojoTest {
 
     public static final String TEST_PROJECT_ROOT = "target/test-project-root";
 
-    private BonitaConnectorDependencyMojo mojo;
+    private BonitaActorFilterDependencyMojo mojo;
 
     @BeforeEach
     void setUp() throws IOException {
 
-        mojo = new BonitaConnectorDependencyMojo();
+        mojo = new BonitaActorFilterDependencyMojo();
         mojo.setProjectDirectory(new File(TEST_PROJECT_ROOT));
         mojo.setBuildDirectory(new File(TEST_PROJECT_ROOT + "/target"));
 
@@ -41,18 +39,17 @@ class BonitaConnectorDependencyMojoTest extends AbstractBonitaDependencyMojoTest
 
     @Override
     protected String getDefinitionFolder() {
-        return mojo.getConnector().getDefinitionFolder();
+        return mojo.getActorFilter().getDefinitionFolder();
     }
 
     @Override
     protected String getImplementationFolder() {
-        return mojo.getConnector().getImplementationFolder();
+        return mojo.getActorFilter().getImplementationFolder();
     }
 
     @Override
     protected String getLibFolder() {
-        return mojo.getConnector().getLibFolder();
+        return mojo.getActorFilter().getLibFolder();
     }
-
 
 }

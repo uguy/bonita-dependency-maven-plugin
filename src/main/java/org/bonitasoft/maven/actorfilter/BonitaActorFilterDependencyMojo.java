@@ -1,4 +1,4 @@
-package org.bonitasoft.maven.connector;
+package org.bonitasoft.maven.actorfilter;
 
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -18,19 +18,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-@Mojo(name = "connector-unpack",
+@Mojo(name = "actorfilter-unpack",
         defaultPhase = LifecyclePhase.GENERATE_SOURCES,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true)
-public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo {
+public class BonitaActorFilterDependencyMojo extends AbstractBonitaDependencyMojo {
 
     @Getter
-    @Parameter(name = "connector", property = "connector")
-    private Connector connector = new Connector();
+    @Parameter(name = "actorFilter", property = "actorFilter")
+    private ActorFilter actorFilter = new ActorFilter();
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        DependencySelector dependencySelector = new DependencySelector(project.getDependencies(), connector.getIncludes());
+        DependencySelector dependencySelector = new DependencySelector(project.getDependencies(), actorFilter.getIncludes());
         List<Dependency> dependencies = dependencySelector.select();
         for (Dependency dependency : dependencies) {
             File artifactFile = resolveDependencyFile(dependency);
@@ -43,13 +43,13 @@ public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo 
                             case "def":
                             case "properties":
                             case "png": // TODO other image format?
-                                moveToFolder(child, projectPath.resolve(connector.getDefinitionFolder()));
+                                moveToFolder(child, projectPath.resolve(actorFilter.getDefinitionFolder()));
                                 break;
                             case "impl":
-                                moveToFolder(child, projectPath.resolve(connector.getImplementationFolder()));
+                                moveToFolder(child, projectPath.resolve(actorFilter.getImplementationFolder()));
                                 break;
                             case "jar":
-                                moveToFolder(child, projectPath.resolve(connector.getLibFolder()));
+                                moveToFolder(child, projectPath.resolve(actorFilter.getLibFolder()));
                                 break;
                             default:
                                 getLog().warn(String.format("Unreconize extension for '%s', ignored.", child.getFileName()));
@@ -62,5 +62,4 @@ public class BonitaConnectorDependencyMojo extends AbstractBonitaDependencyMojo 
             }
         }
     }
-
 }
