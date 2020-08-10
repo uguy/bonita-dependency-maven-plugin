@@ -16,13 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BonitaConnectorDependencyMojoTest {
 
+    public static final String TEST_PROJECT_ROOT = "target/test-project-root";
+
     private BonitaConnectorDependencyMojo mojo;
 
     @BeforeEach
     void setUp() throws IOException {
 
         mojo = new BonitaConnectorDependencyMojo();
-        mojo.setBuildDirectory(new File("target/test-project-root/target"));
+        mojo.setProjectDirectory(new File(TEST_PROJECT_ROOT));
+        mojo.setBuildDirectory(new File(TEST_PROJECT_ROOT + "/target"));
 
         if(mojo.getBuildDirectory().exists()){
             Files.walk(mojo.getBuildDirectory().toPath())
