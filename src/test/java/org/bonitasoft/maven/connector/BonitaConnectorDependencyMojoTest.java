@@ -22,7 +22,7 @@ class BonitaConnectorDependencyMojoTest {
     void setUp() throws IOException {
 
         mojo = new BonitaConnectorDependencyMojo();
-        mojo.setBuildDirectory(new File("target/test/"));
+        mojo.setBuildDirectory(new File("target/test-project-root/target"));
 
         if(mojo.getBuildDirectory().exists()){
             Files.walk(mojo.getBuildDirectory().toPath())
@@ -38,7 +38,7 @@ class BonitaConnectorDependencyMojoTest {
         // Given
         String zipName = "connector-starwars-1.0.0-SNAPSHOT";
         File zip = new File("src/test/resources/" + zipName + ".zip");
-        File buildDirectory = new File("target");
+        File buildDirectory = mojo.getBuildDirectory();
         // When
         Path path = mojo.unpackDependency(zip,buildDirectory.toPath());
 
@@ -58,8 +58,8 @@ class BonitaConnectorDependencyMojoTest {
         Path path = mojo.unpackDependency(zip,buildDirectory);
 
         // When
-        mojo.moveToFolder(path.resolve(connectorName+".def"), buildDirectory.resolve(mojo.getConnector().getDefinitionFolder()));
-        mojo.moveToFolder(path.resolve(connectorName+".impl"),buildDirectory.resolve(mojo.getConnector().getImplementationFolder()));
+        mojo.moveToFolder(path.resolve(connectorName+".def"), buildDirectory.resolve("../" + mojo.getConnector().getDefinitionFolder()));
+        mojo.moveToFolder(path.resolve(connectorName+".impl"),buildDirectory.resolve("../" + mojo.getConnector().getImplementationFolder()));
 
         // Then
         assertThat(path).exists();

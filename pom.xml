@@ -161,6 +161,27 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-install-plugin</artifactId>
+                        <version>3.0.0-M1</version>
+                        <executions>
+                            <execution>
+                                <id>install-connector</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>install-file</goal>
+                                </goals>
+                                <configuration>
+                                    <file>${project.basedir}/src/test/resources/connector-starwars-1.0.0-SNAPSHOT.zip</file>
+                                    <groupId>com.company.connector</groupId>
+                                    <artifactId>connector-starwars</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <packaging>zip</packaging>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-invoker-plugin</artifactId>
                         <version>3.2.1</version>
                         <configuration>
