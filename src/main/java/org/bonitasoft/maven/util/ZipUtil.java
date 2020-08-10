@@ -1,4 +1,4 @@
-package org.bonitasoft.maven;
+package org.bonitasoft.maven.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

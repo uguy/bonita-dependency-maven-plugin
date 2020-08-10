@@ -1,0 +1,13 @@
+File connectorDef = new File(basedir, "connectors-def/connector-starwars.def");
+if(!connectorDef.exists() || connectorDef.length() == 0) {
+	System.out.println("Missing 'connector-starwars.def'");
+	return false;
+}
+
+File connectorImpl = new File(basedir, "connectors-impl/connector-starwars.impl");
+if(!connectorImpl.exists() || connectorImpl.length() == 0) {
+	System.out.println("Missing 'connector-starwars.impl'");
+	return false;
+}
+
+return true;
