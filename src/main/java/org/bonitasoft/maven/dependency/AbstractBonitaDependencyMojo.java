@@ -1,4 +1,4 @@
-package org.bonitasoft.maven;
+package org.bonitasoft.maven.dependency;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.bonitasoft.maven.util.ZipUtil;
+import org.bonitasoft.maven.dependency.exception.BonitaMojoException;
+import org.bonitasoft.maven.dependency.util.ZipUtil;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -31,26 +32,31 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 
+import static java.lang.String.format;
+
+/**
+ * Base Bonita Dependency Mojo
+ */
 @Getter
 @Setter
 public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
+    @Parameter(defaultValue = "${project.basedir}")
+    protected File projectBaseDirectory;
+    @Parameter(defaultValue = "${project.build.directory}")
+    protected File projectBuildDirectory;
+
     @Parameter(defaultValue = "${session}", readonly = true)
     protected MavenSession mavenSession;
 
-    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
-    protected RepositorySystemSession repositorySystemSession;
     @Component
     protected RepositorySystem repositorySystem;
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
     protected List<RemoteRepository> remoteRepositories;
-
-    @Parameter(defaultValue = "${project.basedir}")
-    protected File projectDirectory;
-    @Parameter(defaultValue = "${project.build.directory}")
-    protected File buildDirectory;
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    protected RepositorySystemSession repositorySystemSession;
 
     @Parameter(property = "skip", defaultValue = "false")
     private boolean skip;
@@ -66,7 +72,13 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
     public abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
-    protected Path unpackDependency(File artifactFile, Path workingDir) throws MojoExecutionException {
+    /**
+     * Unpack the given dependency file in the given working directory
+     * @param artifactFile the dependency file to unpack
+     * @param workingDir the working directory
+     * @return the path of the unpack dependency
+     */
+    protected Path unpackDependency(File artifactFile, Path workingDir) {
         try {
             if (!workingDir.toFile().exists()) {
                 workingDir.toFile().mkdirs();
@@ -76,11 +88,17 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
             ZipUtil.unzip(artifactFile, targetFolder);
             return targetFolder;
         } catch (IOException e) {
-            throw new MojoExecutionException("Unable to unzip artifact.", e);
+            throw new BonitaMojoException("Unable to unzip artifact.", e);
         }
     }
 
-    protected void moveToFolder(Path sourceFile, Path destinationFolder) {
+    /**
+     * Copy sourceFile to destinationFolder. If destination does not exist, it will be created.
+     * The resulting file path will be like destinationFolder/sourceFileName
+     * @param sourceFile the source file to copy
+     * @param destinationFolder the destination folder
+     */
+    protected void copyToFolder(Path sourceFile, Path destinationFolder) {
         try {
             // Ensure destination folder exists
             File destFolder = destinationFolder.toFile();
@@ -90,22 +108,33 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
             // Copy file to destination
             Path destFile = destinationFolder.resolve(sourceFile.getFileName());
-            getLog().debug(String.format("copy file %s to %s", sourceFile, destFile));
+            getLog().debug(format("copy file %s to %s", sourceFile, destFile));
             Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException e) {
-            throw new RuntimeException(
-                    String.format("An error occured while copying file '%s' to '%s'", sourceFile, destinationFolder), e);
+            throw new BonitaMojoException(format("An error occured while copying file '%s' to '%s'", sourceFile, destinationFolder), e);
         }
     }
 
+    /**
+     * Resolve maven dependency from local or remote repositories and return the associated artifact file
+     * @param dependency the {@link Dependency} to resolve
+     * @return the associated artifact file
+     * @throws MojoExecutionException
+     */
     protected File resolveDependencyFile(Dependency dependency) throws MojoExecutionException {
         Artifact artifact = this.getArtifactFile(dependency);
         // Now we have the artifact file locally stored available and we can do something with it
         return artifact.getFile();
     }
 
-    protected Artifact getArtifactFile(Dependency dependency) throws MojoExecutionException {
+    /**
+     * Resolve maven dependency from local or remote repositories and return the associated artifact
+     * @param dependency the {@link Dependency} to resolve
+     * @return the associated {@link Artifact}
+     * @throws MojoExecutionException
+     */
+    protected Artifact getArtifactFile(Dependency dependency) {
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new org.eclipse.aether.graph.Dependency(toArtifact(dependency), dependency.getScope()));
@@ -116,20 +145,21 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
         try {
             dependencyResult = repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
-            throw new MojoExecutionException("Unable to find/resolve artifact: " + dependency.getManagementKey(), e);
+            throw new BonitaMojoException("Unable to find/resolve artifact: " + dependency.getManagementKey(), e);
         }
 
         ArtifactResult artifactResult = dependencyResult.getArtifactResults().stream().findFirst()
-                .orElseThrow(() -> new MojoExecutionException("Unable to find/resolve artifact : " + dependency.getManagementKey()));
+                .orElseThrow(() -> new BonitaMojoException("Unable to find/resolve artifact : " + dependency.getManagementKey()));
 
         return artifactResult.getArtifact();
     }
 
-    protected DefaultArtifact toArtifact(Dependency dependency) {
-        //"<groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>"
-        String coords = String.format("%s:%s:%s:%s:%s", dependency.getGroupId(), dependency.getArtifactId(), dependency.getType(), dependency.getClassifier(), dependency.getVersion());
-//        DefaultArtifact defaultArtifact = new DefaultArtifact(coords);
-        DefaultArtifact defaultArtifact = new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion(), new HashMap<String, String>(), (File) null);
-        return defaultArtifact;
+    /**
+     * Convert a {@link Dependency} to an {@link Artifact}
+     * @param dependency the dependency to convert
+     * @return the resulting artifact
+     */
+    protected Artifact toArtifact(Dependency dependency) {
+        return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), dependency.getType(), dependency.getVersion(), new HashMap<>(), (File) null);
     }
 }

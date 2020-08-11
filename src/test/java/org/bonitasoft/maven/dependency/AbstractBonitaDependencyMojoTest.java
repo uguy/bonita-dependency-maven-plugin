@@ -1,8 +1,8 @@
-package org.bonitasoft.maven;
+package org.bonitasoft.maven.dependency;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.Artifact;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -13,8 +13,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractBonitaDependencyMojoTest {
 
     protected abstract AbstractBonitaDependencyMojo getMojo();
+
     protected abstract String getDefinitionFolder();
+
     protected abstract String getImplementationFolder();
+
     protected abstract String getLibFolder();
 
     @Test
@@ -22,9 +25,9 @@ public abstract class AbstractBonitaDependencyMojoTest {
         // Given
         String zipName = "connector-starwars-1.0.0-SNAPSHOT";
         File zip = new File("src/test/resources/" + zipName + ".zip");
-        File buildDirectory = getMojo().getBuildDirectory();
+        File buildDirectory = getMojo().getProjectBuildDirectory();
         // When
-        Path path = getMojo().unpackDependency(zip,buildDirectory.toPath());
+        Path path = getMojo().unpackDependency(zip, buildDirectory.toPath());
 
         // Then
         assertThat(path).exists();
@@ -38,12 +41,12 @@ public abstract class AbstractBonitaDependencyMojoTest {
         String connectorName = "connector-starwars";
         String zipName = connectorName + "-1.0.0-SNAPSHOT";
         File zip = new File("src/test/resources/" + zipName + ".zip");
-        Path buildDirectory = getMojo().getBuildDirectory().toPath();
+        Path buildDirectory = getMojo().getProjectBuildDirectory().toPath();
         Path path = getMojo().unpackDependency(zip, buildDirectory);
 
         // When
-        getMojo().moveToFolder(path.resolve(connectorName + ".def"), buildDirectory.resolve("../def"));
-        getMojo().moveToFolder(path.resolve(connectorName + ".impl"), buildDirectory.resolve("../impl"));
+        getMojo().copyToFolder(path.resolve(connectorName + ".def"), buildDirectory.resolve("../def"));
+        getMojo().copyToFolder(path.resolve(connectorName + ".impl"), buildDirectory.resolve("../impl"));
 
         // Then
         assertThat(path).exists();
@@ -59,7 +62,7 @@ public abstract class AbstractBonitaDependencyMojoTest {
         dependency.setVersion("1.0.0-SNAPSHOT");
         dependency.setType("zip");
 
-        DefaultArtifact artifact = getMojo().toArtifact(dependency);
+        Artifact artifact = getMojo().toArtifact(dependency);
 
         assertThat(artifact.getGroupId()).isEqualTo(dependency.getGroupId());
         assertThat(artifact.getArtifactId()).isEqualTo(dependency.getArtifactId());

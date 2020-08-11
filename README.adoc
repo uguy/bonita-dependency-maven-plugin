@@ -14,13 +14,16 @@
 
 image::bonita-logo.png[bonitasoft]
 
+[cols="4",frame=none,options=autowidth]
+|===
+a| image::https://github.com/bonitasoft/bonita-dependency-plugin/workflows/Build/badge.svg[link=https://github.com/bonitasoft/bonita-dependency-plugin/actions?query=workflow%3ABuild]
+a| image::https://img.shields.io/github/v/release/bonitasoft/bonita-dependency-plugin?color=blue&label=Release&include_prereleases[link=https://github.com/bonitasoft/bonita-dependency-plugin/releases]
+a| image::https://img.shields.io/maven-central/v/org.bonitasoft.archetypes/bonita-dependency-plugin.svg?label=Maven%20Central&color=orange[link=https://search.maven.org/search?q=g:%22org.bonitasoft.archetypes%22%20AND%20a:%22bonita-dependency-plugin%22]
+a| image::https://img.shields.io/badge/License-GPL%20v2-yellow.svg[link=https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html]
+|===
+
 = bonita-dependency-plugin
 A maven plugin to manage Bonita project dependencies
-
-image::https://github.com/bonitasoft/bonita-dependency-plugin/workflows/Build/badge.svg[link=https://github.com/bonitasoft/bonita-dependency-plugin/actions?query=workflow%3ABuild]
-image::https://img.shields.io/github/v/release/bonitasoft/bonita-dependency-plugin?color=blue&label=Release&include_prereleases[link=https://github.com/bonitasoft/bonita-dependency-plugin/releases]
-image::https://img.shields.io/maven-central/v/org.bonitasoft.archetypes/bonita-dependency-plugin.svg?label=Maven%20Central&color=orange[link=https://search.maven.org/search?q=g:%22org.bonitasoft.archetypes%22%20AND%20a:%22bonita-dependency-plugin%22]
-image::https://img.shields.io/badge/License-GPL%20v2-yellow.svg[link=https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html]
 
 This project is a maven plugin to manage Bonita project dependencies. It use maven capacities for dependency management to
 retrieve automatically project dependencies like connectors, actor-filters, etc.

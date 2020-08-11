@@ -1,17 +1,32 @@
-package org.bonitasoft.maven.util;
+package org.bonitasoft.maven.dependency.util;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ZipUtil {
+/**
+ * Utility class for zip/unzip operations
+ */
+public final class ZipUtil {
 
     private static final int BUFFER_SIZE = 4096;
 
+    private ZipUtil() {
+        // Utility class
+    }
+
+    /**
+     * Unzip file in the target directory
+     *
+     * @param file      the file to unzip
+     * @param targetDir the target directory where to unzip the file
+     * @return the path where the file has been unzipped
+     * @throws IOException
+     */
     public static Path unzip(File file, Path targetDir) throws IOException {
         try (FileInputStream fis = new FileInputStream(file);
-                ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));) {
+             ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 int count;

@@ -1,7 +1,7 @@
-package org.bonitasoft.maven.actorfilter;
+package org.bonitasoft.maven.dependency.actorfilter;
 
-import org.bonitasoft.maven.AbstractBonitaDependencyMojo;
-import org.bonitasoft.maven.AbstractBonitaDependencyMojoTest;
+import org.bonitasoft.maven.dependency.AbstractBonitaDependencyMojo;
+import org.bonitasoft.maven.dependency.AbstractBonitaDependencyMojoTest;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -20,14 +20,14 @@ class BonitaActorFilterDependencyMojoTest extends AbstractBonitaDependencyMojoTe
     void setUp() throws IOException {
 
         mojo = new BonitaActorFilterDependencyMojo();
-        mojo.setProjectDirectory(new File(TEST_PROJECT_ROOT));
-        mojo.setBuildDirectory(new File(TEST_PROJECT_ROOT + "/target"));
+        mojo.setProjectBaseDirectory(new File(TEST_PROJECT_ROOT));
+        mojo.setProjectBuildDirectory(new File(TEST_PROJECT_ROOT + "/target"));
 
-        if (mojo.getBuildDirectory().exists()) {
-            Files.walk(mojo.getBuildDirectory().toPath())
+        if (mojo.getProjectBuildDirectory().exists()) {
+            Files.walk(mojo.getProjectBuildDirectory().toPath())
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
-                    .filter(item -> !item.getPath().equals(mojo.getBuildDirectory().getAbsolutePath()))
+                    .filter(item -> !item.getPath().equals(mojo.getProjectBuildDirectory().getAbsolutePath()))
                     .forEach(File::delete);
         }
     }
