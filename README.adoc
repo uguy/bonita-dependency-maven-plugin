@@ -86,10 +86,19 @@ For more details about apache maven, please refer to the https://maven.apache.or
 
 //_**TODO**_: Here you should write what are all of the configurations a user can enter when using the project.
 
+ifeval::[{safe-mode-level} >= 20]
 [source, xml]
 ----
-include::./src/it/all-dependency/pom.xml[]
+include::https://raw.githubusercontent.com/uguy/bonita-dependency-maven-plugin/master/src/it/all-dependency/pom.xml[]
 ----
+endif::[]
+ifeval::[{safe-mode-level} < 20]
+.pom.xml
+[source, xml]
+----
+include::src/it/all-dependency/pom.xml[]
+----
+endif::[]
 
 == Contributing
 
