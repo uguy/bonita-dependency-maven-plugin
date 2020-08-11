@@ -22,7 +22,7 @@ a| image::https://img.shields.io/maven-central/v/org.bonitasoft.archetypes/bonit
 a| image::https://img.shields.io/badge/License-GPL%20v2-yellow.svg[link=https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html]
 |===
 
-= bonita-dependency-plugin
+= bonita-dependency-maven-plugin
 A maven plugin to manage Bonita project dependencies
 
 This project is a maven plugin to manage Bonita project dependencies. It use maven capacities for dependency management to
@@ -55,7 +55,7 @@ Prerequisite:
 
 - a git client
 - a java (jdk8 or higher)
-- maven (optional if you choosed to use https://github.com/takari/maven-wrapper[maven wrapper script] as archetype option)
+- maven (optional if you choosed to use https://github.com/takari/maven-wrapper[maven wrapper script])
 
 WARNING: The generated java skeleton use https://projectlombok.org/features/all[lombok project] to reduce boilerplate code. This project use annotation processing to generate bytecode at compile time.
 You should then, either https://projectlombok.org/setup/overview[install lombok plugin
@@ -68,12 +68,10 @@ in your IDE] for smooth integration or replace lombok dependency and code by sta
 
 [source,bash]
 ----
-git clone https://your.github.com/datasource.git
-cd datasource/
-mvn package
+git clone https://your.github.com/bonita-dependency-maven-plugin.git
+cd bonita-dependency-maven-plugin/
+mvn install -Pit
 ----
-
-The build should produce a zip archive under the `target/` folder named `ds-rest-api-1.0.0-SNAPSHOT.zip`
 
 //_**TODO**_: Here again you should state what actually happens when the code above gets
 //executed.
@@ -84,15 +82,13 @@ For more details about apache maven, please refer to the https://maven.apache.or
 
 //_**TODO**_: In case there's some step you have to take that publishes this project to a server, this is the right time to state it.
 
-Take the built artifact `ds-rest-api-1.0.0-SNAPSHOT.zip` and upload it to your Bonita plateform (see https://documentation.bonitasoft.com/bonita/7.10/rest-api-extensions#toc7)
-
 == Configuration
 
 //_**TODO**_: Here you should write what are all of the configurations a user can enter when using the project.
 
 [source, xml]
 ----
-include::src/it/all-dependency/pom.xml[]
+include::./src/it/all-dependency/pom.xml[]
 ----
 
 == Contributing
@@ -108,7 +104,7 @@ branch. Pull requests are warmly welcome."
 If there's anything else the developer needs to know (e.g. the code style
 guide), you should link it here. If there's a lot of things to take into
 consideration, it is common to separate this section to its own file called
-`CONTRIBUTING.adoc` (or similar). If so, you should say that it exists here.
+`CONTRIBUTING.md` (or similar). If so, you should say that it exists here.
 
 == Links
 

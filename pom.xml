@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.bonitasoft.maven</groupId>
-    <artifactId>bonita-dependency-plugin</artifactId>
+    <artifactId>bonita-dependency-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>bonita-dependency-plugin</name>
+    <name>bonita-dependency-maven-plugin</name>
 
     <url>https://www.bonitasoft.com</url>
 
