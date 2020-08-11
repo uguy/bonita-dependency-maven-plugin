@@ -35,6 +35,8 @@ This project is a maven plugin to manage Bonita project dependencies. It use mav
 retrieve automatically project dependencies like connectors, actor-filters, etc.
 Those project dependencies can now live their own life in dedicated repositories and can be shared and reused more easily.
 
+WARNING: Work in progress ! Not ready for use yet !
+
 //_**TODO**_: A brief description of your project, what it is used for and how does life get
 //awesome when someone starts to use it.
 
