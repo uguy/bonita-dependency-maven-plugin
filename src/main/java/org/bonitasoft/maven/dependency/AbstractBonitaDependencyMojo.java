@@ -59,7 +59,7 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
     protected RepositorySystemSession repositorySystemSession;
 
     @Parameter(property = "skip", defaultValue = "false")
-    private boolean skip;
+    private boolean skip = false;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -74,8 +74,9 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
     /**
      * Unpack the given dependency file in the given working directory
+     *
      * @param artifactFile the dependency file to unpack
-     * @param workingDir the working directory
+     * @param workingDir   the working directory
      * @return the path of the unpack dependency
      */
     protected Path unpackDependency(File artifactFile, Path workingDir) {
@@ -95,7 +96,8 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
     /**
      * Copy sourceFile to destinationFolder. If destination does not exist, it will be created.
      * The resulting file path will be like destinationFolder/sourceFileName
-     * @param sourceFile the source file to copy
+     *
+     * @param sourceFile        the source file to copy
      * @param destinationFolder the destination folder
      */
     protected void copyToFolder(Path sourceFile, Path destinationFolder) {
@@ -118,23 +120,11 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
     /**
      * Resolve maven dependency from local or remote repositories and return the associated artifact file
+     *
      * @param dependency the {@link Dependency} to resolve
      * @return the associated artifact file
-     * @throws MojoExecutionException
      */
-    protected File resolveDependencyFile(Dependency dependency) throws MojoExecutionException {
-        Artifact artifact = this.getArtifactFile(dependency);
-        // Now we have the artifact file locally stored available and we can do something with it
-        return artifact.getFile();
-    }
-
-    /**
-     * Resolve maven dependency from local or remote repositories and return the associated artifact
-     * @param dependency the {@link Dependency} to resolve
-     * @return the associated {@link Artifact}
-     * @throws MojoExecutionException
-     */
-    protected Artifact getArtifactFile(Dependency dependency) {
+    public File resolveDependencyFile(Dependency dependency) {
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new org.eclipse.aether.graph.Dependency(toArtifact(dependency), dependency.getScope()));
@@ -150,12 +140,15 @@ public abstract class AbstractBonitaDependencyMojo extends AbstractMojo {
 
         ArtifactResult artifactResult = dependencyResult.getArtifactResults().stream().findFirst()
                 .orElseThrow(() -> new BonitaMojoException("Unable to find/resolve artifact : " + dependency.getManagementKey()));
+        Artifact artifact = artifactResult.getArtifact();
 
-        return artifactResult.getArtifact();
+        // Now we have the artifact file locally stored available and we can do something with it
+        return artifact.getFile();
     }
 
     /**
      * Convert a {@link Dependency} to an {@link Artifact}
+     *
      * @param dependency the dependency to convert
      * @return the resulting artifact
      */

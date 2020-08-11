@@ -165,6 +165,9 @@
                             <goal>helpmojo</goal>
                         </goals>
                         <phase>process-classes</phase>
+                        <configuration>
+                            <helpPackageName>org.bonitasoft.maven.dependency</helpPackageName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

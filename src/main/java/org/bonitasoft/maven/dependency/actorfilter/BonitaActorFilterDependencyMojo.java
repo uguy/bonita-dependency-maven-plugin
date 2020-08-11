@@ -18,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 /**
  * Actor filter Bonita Dependency Mojo. Manage Actor filter dependencies for a bonita project (unpack resources at the right place)
